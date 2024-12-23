@@ -5,11 +5,16 @@ from config import NEWS_API_KEY
 app = Flask(__name__)
 
 
-# homepage
+# Homepage route
 @app.route("/")
+def index():
+    return render_template("index.html")
+
+
+# News page
+@app.route("/news")
 def news():
     query = request.args.get("query", "latest")
-    # url = f"https://newsapi.org/v2/top-headlines?country={query}&apiKey={NEWS_API_KEY}"
     url = f"https://newsapi.org/v2/everything?q={query}&apiKey={NEWS_API_KEY}"
     response = requests.get(url)
     news_data = response.json()

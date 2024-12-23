@@ -1,5 +1,53 @@
 {% extends "base.html"%}
-
+{% block title %}Home{% endblock %}
 {% block body %}
+{% include 'navbar.html' %}
+<div class="container mt-5">
+    <!-- Welcome Section -->
+    <div class="row">
+        <div class="col text-center">
+            <h1 class="display-4">Welcome to RoadAware</h1>
+            <p class="lead">Your intelligent car reversing system with real-time alerts and updates.</p>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Safe Parking</h5>
+                    <p class="card-text">Our system uses ultrasonic sensors to help you park safely by detecting objects
+                        behind your car and providing timely alerts.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Real-Time Data</h5>
+                    <p class="card-text">Get accurate distance data and parking status through an easy-to-use mobile
+                        app. Stay informed with live sensor data and feedback.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">News Updates</h5>
+                    <p class="card-text">Stay connected with real-time traffic and safety updates directly from the app.
+                        Our news feature keeps you informed while you drive.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action Section -->
+    <div class="row mt-5">
+        <div class="col text-center">
+            <a href="{{ url_for('news') }}" class="btn btn-primary btn-lg">Learn More</a>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
