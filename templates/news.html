@@ -4,7 +4,9 @@
 {% include 'navbar.html' %}
 <div class="container">
     <h1 class="my-4 text-center">welcome to my app hello</h1>
-    <form class="form-inline justify-content-center mb-4" method="get" action="/">
+    <p>Session Google ID: {{ session.get("google_id") }}</p>
+    <!-- <p>Admin Google ID: {{ google_admin_id}}</p> -->
+    <form class="form-inline justify-content-center mb-4" method="get" action="/news">
         <input class="form-control mr-5" type="text" name="query" value="{{ query }}" placeholder="Search"
             aria-label="Search">
         <button class="btn btn-outline-success" type="submit">Search</button>
