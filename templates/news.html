@@ -1,0 +1,29 @@
+{% extends "base.html"%}
+{% block title %}Home{% endblock %}
+{% block body %}
+{% include 'navbar.html' %}
+<div class="container">
+    <h1 class="my-4 text-center">welcome to my app</h1>
+    <form class="form-inline justify-content-center mb-4" method="get" action="/">
+        <input class="form-control mr-5" type="text" name="query" value="{{ query }}" placeholder="Search"
+            aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+    <div class="row">
+        {% for article in articles %}
+        <div class="col-md-6">
+            <div class="card mb-4 news-article">
+                {% if article.urlToImage%}
+                <img src="{{ article.urlToImage }}" alt="picture" class="card-img-top">
+                {% endif %}
+                <div class="card-body">
+                    <h5><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></h5>
+                    <p class="card-text"> {{ article.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
