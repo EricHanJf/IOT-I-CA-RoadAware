@@ -1,4 +1,4 @@
-{% extends "base.html"%}
+{% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block body %}
 {% include 'navbar.html' %}
@@ -6,53 +6,81 @@
     <!-- Welcome Section -->
     <div class="row">
         <div class="col text-center">
-            <h1 class="display-4">Welcome to RoadAware</h1>
+            <h1 class="display-4">Welcome to RoadEase</h1>
             <p class="lead">Your intelligent car reversing system with real-time alerts and updates.</p>
         </div>
     </div>
 
-    <!-- Features Section -->
-    <div class="row mt-5">
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Safe Parking</h5>
-                    <p class="card-text">Our system uses ultrasonic sensors to help you park safely by detecting objects
-                        behind your car and providing timely alerts.</p>
+    <!-- Google Login Button Section -->
+    <div class="row mt-4">
+        <div class="col text-center">
+            <a href="/login">
+                <button type="button" class="login-with-google-btn">
+                    Sign in with Google
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Sensor Image Slider -->
+    <div class="row mt-5 align-items-center">
+        <div class="col-md-6">
+            <div class="image-slider" style="max-width: 470px;">
+                <div class="slider-wrapper">
+                    <img src="{{ url_for('static', filename='image/ultrasonicsensor.jpg') }}" alt="sensor"
+                        class="slider-image" style="width: 100%; height: 350px;">
+                    <img src="{{ url_for('static', filename='image/buzzer.jpg') }}" alt="sensor" class="slider-image"
+                        style="width: 100%; height: 350px;">
+                    <img src="{{ url_for('static', filename='image/RGBLED.jpg') }}" alt="sensor" class="slider-image"
+                        style="width: 100%; height: 350px;">
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Real-Time Data</h5>
-                    <p class="card-text">Get accurate distance data and parking status through an easy-to-use mobile
-                        app. Stay informed with live sensor data and feedback.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <h5 class="card-title">News Updates</h5>
-                    <p class="card-text">Stay connected with real-time traffic and safety updates directly from the app.
-                        Our news feature keeps you informed while you drive.</p>
-                </div>
+        <div class="col-md-6">
+            <div class="article mb-4" style="max-width: 500px;">
+                <h5 class="card-title">Safe Parking</h5>
+                <p class="card-text">Our system uses ultrasonic sensors to help you park safely by detecting objects
+                    behind your car and providing timely alerts. This technology not only enhances safety but also
+                    reduces the stress associated with parking in tight spots. With an audible alert and visual
+                    indicators, you can confidently maneuver your vehicle, knowing that our system is watching your
+                    back.</p>
             </div>
         </div>
     </div>
-    <a href="/login">
-        <button type="button" class="login-with-google-btn">
-            Sign in with Google
-        </button>
-    </a>
 
-    <!-- Call to Action Section -->
-    <div class="row mt-5">
-        <div class="col text-center">
-            <a href="{{ url_for('news') }}" class="btn btn-primary btn-lg">Learn More</a>
+    <!-- Article 2 -->
+    <div class="row mt-5 align-items-center">
+        <div class="col-md-6">
+            <div class="article mb-4" style="max-width: 500px;">
+                <h5 class="card-title">Real-Time Data</h5>
+                <p class="card-text">Get accurate distance data and parking status through an easy-to-use mobile app.
+                    Stay informed with live sensor data and feedback, allowing you to make informed decisions while
+                    parking. The app provides a user-friendly interface that displays real-time information, ensuring
+                    that you are always aware of your surroundings. Whether you're in a busy urban area or a quiet
+                    neighborhood, our system keeps you connected and safe.</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='image/pubnub.jpg') }}" alt="pubnub" class="img-fluid mt-1"
+                style="width: 80%; height: auto;">
+        </div>
+    </div>
+
+    <!-- Article 3 -->
+    <div class="row mt-5 align-items-center">
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='image/news-update.jpg') }}" alt="news" class="img-fluid mt-1"
+                style="width: 80%; height: auto;">
+        </div>
+        <div class="col-md-5">
+            <div class="article mb-4" style="max-width: 500px; margin: auto;">
+                <h5 class="card-title">News Updates</h5>
+                <p class="card-text">Stay connected with real-time traffic and safety updates directly from the app. Our
+                    news feature keeps you informed while you drive, offering alerts about road conditions, accidents,
+                    and other critical information that may affect your journey. With Roadease, you can navigate with
+                    confidence, knowing that you have access to the latest updates at your fingertips.</p>
+            </div>
         </div>
     </div>
 </div>
-
 {% endblock %}
