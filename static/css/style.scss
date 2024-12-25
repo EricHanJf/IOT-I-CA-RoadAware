@@ -81,3 +81,17 @@
     75% { transform: translateX(0); }
     100% { transform: translateX(0); }
 }
+
+/* this is navbar in CSS style*/
+
+#navbar{
+    padding: 1rem;
+}
+
+.container-fluid .navbar-brand{
+    font-size: 1.5rem;
+}
+
+.nav-item .nav-link{
+    font-size: 1.2rem;
+}
