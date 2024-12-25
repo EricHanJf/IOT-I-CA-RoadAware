@@ -7,8 +7,8 @@
     <p>Session Google ID: {{ session.get("google_id") }}</p>
     <!-- <p>Admin Google ID: {{ google_admin_id}}</p> -->
     <form class="form-inline justify-content-center mb-4" method="get" action="/news">
-        <input class="form-control mr-5" type="text" name="query" value="{{ query }}" placeholder="Search"
-            aria-label="Search">
+        <input class="form-control mr-5" type="text" name="query" value="{{ query if query != 'latest' else '' }}"
+            placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
     <div class="row">

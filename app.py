@@ -7,6 +7,7 @@ from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
 import pathlib
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -81,10 +82,13 @@ def index():
 @login_is_required
 def news():
     query = request.args.get("query", "latest")
-    url = f"https://newsapi.org/v2/everything?q={query}&apiKey={NEWS_API_KEY}"
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    url = f"https://newsapi.org/v2/everything?q={query}&apiKey={NEWS_API_KEY}&timestamp={timestamp}"
     response = requests.get(url)
     news_data = response.json()
     articles = news_data.get("articles", [])
+    # app.logger.debug(f"Total articles fetched: {len(articles)}")
+    print(f"Total articles fetched: {len(articles)}")
     # print(news_data)
     filter_articles = [
         article
