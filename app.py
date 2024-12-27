@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, abort
 import requests
-from config import NEWS_API_KEY
 import os
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
@@ -8,24 +7,38 @@ from pip._vendor import cachecontrol
 import google.auth.transport.requests
 import pathlib
 from datetime import datetime
+from .config import config
+from . import my_db
+from .my_db import User
+from werkzeug.utils import secure_filename
+
+# from . import my_db
+
+db = my_db.db
 
 app = Flask(__name__)
+app.secret_key = config.get("APP_SECRET_KEY")
 
-app.secret_key = "My_Secret_Key_123!"
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-GOOGLE_CLIENT_ID = (
-    "788082330888-3uijks9jcned5u2vemc1mttc68q3hahq.apps.googleusercontent.com"
-)
-client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
+app.config["SQLALCHEMY_DATABASE_URI"] = config.get("SQLALCHEMY_DATABASE_URI")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+with app.app_context():
+    db.create_all()
+# os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+GOOGLE_CLIENT_ID = config.get("GOOGLE_CLIENT_ID")
+
+client_secret_file = os.path.join(pathlib.Path(__file__).parent, ".client_secrets.json")
 
 flow = Flow.from_client_secrets_file(
-    client_secrets_file=client_secrets_file,
+    client_secrets_file=client_secret_file,
     scopes=[
         "https://www.googleapis.com/auth/userinfo.profile",
         "https://www.googleapis.com/auth/userinfo.email",
         "openid",
     ],
-    redirect_uri="http://127.0.0.1:5000/callback",
+    redirect_uri="https://www.sd3siot.online/callback",
 )
 
 
@@ -46,6 +59,12 @@ def login():
     return redirect(authorization_url)
 
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+
 @app.route("/callback")
 def callback():
     flow.fetch_token(authorization_response=request.url)
@@ -54,7 +73,6 @@ def callback():
         abort(500)
 
     credentials = flow.credentials
-    # request_session = request.session()
     request_session = requests.Session()
     cached_session = cachecontrol.CacheControl(request_session)
     token_request = google.auth.transport.requests.Request(session=cached_session)
@@ -66,8 +84,11 @@ def callback():
     )
 
     session["google_id"] = id_info.get("sub")
-    print(session["google_id"])
     session["name"] = id_info.get("name")
+
+    # Add user to the database
+    my_db.add_user_and_login(session["name"], session["google_id"])
+
     return redirect("/news")
 
 
@@ -83,7 +104,7 @@ def index():
 def news():
     query = request.args.get("query", "latest")
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    url = f"https://newsapi.org/v2/everything?q={query}&apiKey={NEWS_API_KEY}&timestamp={timestamp}"
+    url = f"https://newsapi.org/v2/everything?q={query}&apiKey={config.get("NEWS_API_KEY")}&timestamp={timestamp}"
     response = requests.get(url)
     news_data = response.json()
     articles = news_data.get("articles", [])
@@ -100,4 +121,4 @@ def news():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
