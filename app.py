@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, abort
+from flask import Flask, render_template, request, redirect, session, abort, url_for
 import requests
 import os
 from google.oauth2 import id_token
@@ -85,6 +85,7 @@ def callback():
 
     session["google_id"] = id_info.get("sub")
     session["name"] = id_info.get("name")
+    session["google_avatar"] = id_info["picture"]
 
     # Add user to the database
     my_db.add_user_and_login(session["name"], session["google_id"])
@@ -108,6 +109,7 @@ def news():
     response = requests.get(url)
     news_data = response.json()
     articles = news_data.get("articles", [])
+    google_avatar = session.get("google_avatar")
     # app.logger.debug(f"Total articles fetched: {len(articles)}")
     print(f"Total articles fetched: {len(articles)}")
     # print(news_data)
@@ -117,7 +119,38 @@ def news():
         if "Yahoo" not in article.get("source", {}).get("name", "")
         and "removed" not in article.get("title", "").lower()
     ]
-    return render_template("news.html", articles=filter_articles, query=query)
+    return render_template(
+        "news.html", articles=filter_articles, query=query, avatar_url=google_avatar
+    )
+
+
+# dashboard page Route
+@app.route("/dashboard", endpoint="dashboard")
+@login_is_required
+def dashboard():
+    try:
+        user_id = session["google_id"]
+        user_name = session.get("name")
+        google_admin_id = config.get("GOOGLE_ADMIN_ID")
+        google_avatar = session.get("google_avatar")
+
+        if not user_id or not user_name or user_id != google_admin_id:
+            return redirect(url_for("signin"))
+
+        online_users = my_db.get_all_logged_in_users()
+        print(f"Online users: {online_users}")
+        # google_admin_id = config.get("GOOGLE_ADMIN_ID")
+
+        return render_template(
+            "dashboard.html",
+            user_id=user_id,
+            google_admin_id=google_admin_id,
+            avatar_url=google_avatar,
+            online_users=online_users,
+        )
+    except Exception as e:
+        print(f"Error in dashboard: {e}")
+        return "An error occurred while loading the dashboard.", 500
 
 
 if __name__ == "__main__":
