@@ -1,4 +1,13 @@
-from flask import Flask, render_template, request, redirect, session, abort, url_for
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    session,
+    abort,
+    url_for,
+    flash,
+)
 import requests
 import os
 from google.oauth2 import id_token
@@ -89,7 +98,8 @@ def callback():
 
     # Add user to the database
     my_db.add_user_and_login(session["name"], session["google_id"])
-
+    print(f"Logged in user ID: {session['google_id']}")
+    print(f"Admin ID: {config.get('GOOGLE_ADMIN_ID')}")
     return redirect("/news")
 
 
@@ -99,26 +109,40 @@ def index():
     return render_template("index.html")
 
 
-# News page
+# for admin globally accessible across templates
+@app.context_processor
+def inject_globals():
+    return {"google_admin_id": config.get("GOOGLE_ADMIN_ID")}
+
+
+# News page route
 @app.route("/news", methods=["GET"], endpoint="news")
 @login_is_required
 def news():
     query = request.args.get("query", "latest")
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    url = f"https://newsapi.org/v2/everything?q={query}&apiKey={config.get("NEWS_API_KEY")}&timestamp={timestamp}"
+    # URL for fetching the latest news
+    url = f"https://newsapi.org/v2/everything?q={query}&sortBy=publishedAt&apiKey={config.get('NEWS_API_KEY')}"
+
     response = requests.get(url)
+    print(f"API Response Code: {response.status_code}")  # Log response code
+    print(response.text)  # Log the full response for debugging
+
+    if response.status_code != 200:
+        return render_template("error.html", message="Failed to fetch news.")
+
     news_data = response.json()
     articles = news_data.get("articles", [])
+
     google_avatar = session.get("google_avatar")
-    # app.logger.debug(f"Total articles fetched: {len(articles)}")
     print(f"Total articles fetched: {len(articles)}")
-    # print(news_data)
     filter_articles = [
         article
         for article in articles
         if "Yahoo" not in article.get("source", {}).get("name", "")
         and "removed" not in article.get("title", "").lower()
+        and article.get("urlToImage")
     ]
+
     return render_template(
         "news.html", articles=filter_articles, query=query, avatar_url=google_avatar
     )
@@ -151,6 +175,22 @@ def dashboard():
     except Exception as e:
         print(f"Error in dashboard: {e}")
         return "An error occurred while loading the dashboard.", 500
+
+
+# delete user route
+@app.route("/delete_user/<int:id>", methods=["POST"], endpoint="delete_user")
+def delete_user(id):
+    try:
+        user = my_db.User.query.get(id)  # Use the passed ID
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            flash("User deleted successfully!")
+        else:
+            flash("User not found.")
+        return redirect(url_for("dashboard"))
+    except Exception as e:
+        return f"Error: {e}"
 
 
 if __name__ == "__main__":
