@@ -102,7 +102,8 @@ def get_all_logged_in_users():
         else:
             read = "checked"
             write = "checked"
-        online_users["users"].append([row.name, row.user_id, read, write])
+        # online_users["users"].append([row.name, row.user_id, read, write])
+        online_users["users"].append([row.name, row.user_id, read, write, row.id])
     return online_users
 
 
