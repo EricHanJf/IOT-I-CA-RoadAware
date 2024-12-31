@@ -23,6 +23,42 @@ class User(db.Model):
         self.write_access = write_access
 
 
+class Car(db.Model):
+    __tablename__ = "car"
+    id = db.Column(db.Integer, primary_key=True)
+    make = db.Column(db.String(50))
+    year = db.Column(db.Integer)
+    type = db.Column(db.String(50))
+    engine_type = db.Column(db.String(50))
+    transmission = db.Column(db.String(20))
+    color = db.Column(db.String(30))
+    picture_url = db.Column(db.String(255))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.String(21), db.ForeignKey("user.user_id"))
+
+    user = db.relationship("User", backref="cars", lazy=True)
+
+    def __init__(
+        self,
+        make,
+        year,
+        type,
+        engine_type,
+        transmission,
+        color,
+        user_id,
+        picture_url=None,
+    ):
+        self.make = make
+        self.year = year
+        self.type = type
+        self.engine_type = engine_type
+        self.transmission = transmission
+        self.color = color
+        self.user_id = user_id
+        self.picture_url = picture_url
+
+
 def delete_all():
     try:
         db.session.query(User).delete()
