@@ -18,7 +18,7 @@ import pathlib
 from datetime import datetime
 from .config import config
 from . import my_db
-from .my_db import User
+from .my_db import Car
 from werkzeug.utils import secure_filename
 
 # from . import my_db
@@ -124,8 +124,8 @@ def news():
     url = f"https://newsapi.org/v2/everything?q={query}&sortBy=publishedAt&apiKey={config.get('NEWS_API_KEY')}"
 
     response = requests.get(url)
-    print(f"API Response Code: {response.status_code}")  # Log response code
-    print(response.text)  # Log the full response for debugging
+    # print(f"API Response Code: {response.status_code}")  # Log response code
+    # print(response.text)  # Log the full response for debugging
 
     if response.status_code != 200:
         return render_template("error.html", message="Failed to fetch news.")
@@ -185,12 +185,84 @@ def delete_user(id):
         if user:
             db.session.delete(user)
             db.session.commit()
-            flash("User deleted successfully!")
+            flash("User deleted successfully!", "admin")
         else:
-            flash("User not found.")
+            flash("User not found.", "admin")
         return redirect(url_for("dashboard"))
     except Exception as e:
         return f"Error: {e}"
+
+
+# Add car route
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+UPLOAD_FOLDER = "var/www/FlaskApp/FlaskApp/static/uploads/cars"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+
+@app.route("/addcar", methods=["GET", "POST"], endpoint="addcar")
+@login_is_required
+def addcar():
+    if request.method == "POST":
+        try:
+            # Get form data
+            make = request.form.get("make")
+            year = request.form.get("year")
+            car_type = request.form.get("type")
+            engine_type = request.form.get("engine_type")
+            transmission = request.form.get("transmission")
+            color = request.form.get("color")
+            picture = request.files.get("picture_url")  # For file uploads
+
+            # Validate required fields
+            if not all([make, year, car_type, engine_type, transmission, color]):
+                flash("All fields are required except the picture.", "danger")
+                return redirect(url_for("addcar"))
+
+            # Validate file and save it
+            carpicture_path = None
+            if picture and allowed_file(picture.filename):
+                filename = secure_filename(picture.filename)
+                upload_folder = app.config["UPLOAD_FOLDER"]
+                os.makedirs(upload_folder, exist_ok=True)  # Ensure directory exists
+                filepath = os.path.join(upload_folder, filename)
+                picture.save(filepath)  # Save the file
+                carpicture_path = f"uploads/cars/{filename}"  # Store relative path
+            elif picture:
+                flash(
+                    "Invalid file type. Allowed types are PNG, JPG, JPEG, GIF.",
+                    "danger",
+                )
+                return redirect(url_for("addcar"))
+
+            # Create a new Car object
+            new_car = Car(
+                make=make,
+                year=int(year),
+                type=car_type,
+                engine_type=engine_type,
+                transmission=transmission,
+                color=color,
+                picture_url=carpicture_path,  # Add the picture path
+                user_id=session["google_id"],
+            )
+
+            # Add and commit to the database
+            db.session.add(new_car)
+            db.session.commit()
+            flash("Car added successfully!", "success")
+            return redirect(
+                url_for("news")
+            )  # Redirect to a success page or back to form
+        except Exception as e:
+            app.logger.error(f"Error adding car: {e}")
+            flash("An error occurred while adding the car. Please try again.", "danger")
+            return redirect(url_for("addcar"))
+    else:
+        return render_template("addcar.html")
 
 
 if __name__ == "__main__":
