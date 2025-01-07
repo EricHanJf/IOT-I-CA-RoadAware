@@ -21,18 +21,6 @@
         <div class="card-body">
 
             <!-- Flash Messages -->
-            <!-- {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                <ul class="list-unstyled mb-0">
-                    {% for message in messages %}
-                    <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endif %}
-            {% endwith %} -->
             {% with messages = get_flashed_messages(category_filter=["admin"]) %}
             {% if messages %}
             <div class="alert alert-info alert-dismissible fade show" role="alert">

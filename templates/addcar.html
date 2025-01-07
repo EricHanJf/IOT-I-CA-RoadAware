@@ -4,66 +4,68 @@
 {% include 'navbar.html' %}
 
 <div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-secondary text-white text-center">
-            <h2 class="mb-0">Add a New Car</h2>
-        </div>
-        <div class="card-body">
-            <form action="{{ url_for('addcar') }}" method="POST" enctype="multipart/form-data">
-                <!-- Car Details -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="make" class="form-label">Make:</label>
-                        <input type="text" class="form-control" id="make" name="make" required
-                            placeholder="Enter car make">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="year" class="form-label">Year:</label>
-                        <input type="number" class="form-control" id="year" name="year" required
-                            placeholder="Enter car year">
-                    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-secondary text-white text-center">
+                    <h2 class="mb-0">Add a New Car</h2>
                 </div>
+                <div class="card-body">
+                    <form action="{{ url_for('addcar') }}" method="POST" enctype="multipart/form-data">
+                        <!-- Car Details -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="make" class="form-label">Make:</label>
+                                <input type="text" class="form-control" id="make" name="make" required
+                                    placeholder="Enter car make">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="year" class="form-label">Year:</label>
+                                <input type="number" class="form-control" id="year" name="year" required
+                                    placeholder="Enter car year">
+                            </div>
+                        </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="type" class="form-label">Type:</label>
-                        <input type="text" class="form-control" id="type" name="type" required
-                            placeholder="Enter car type">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="engine_type" class="form-label">Engine Type:</label>
-                        <input type="text" class="form-control" id="engine_type" name="engine_type" required
-                            placeholder="Enter engine type">
-                    </div>
-                </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="type" class="form-label">Type:</label>
+                                <input type="text" class="form-control" id="type" name="type" required
+                                    placeholder="Enter car type">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="engine_type" class="form-label">Engine Type:</label>
+                                <input type="text" class="form-control" id="engine_type" name="engine_type" required
+                                    placeholder="Enter engine type">
+                            </div>
+                        </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="transmission" class="form-label">Transmission:</label>
-                        <input type="text" class="form-control" id="transmission" name="transmission" required
-                            placeholder="Enter transmission type">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="color" class="form-label">Color:</label>
-                        <input type="text" class="form-control" id="color" name="color" required
-                            placeholder="Enter car color">
-                    </div>
-                </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="transmission" class="form-label">Transmission:</label>
+                                <input type="text" class="form-control" id="transmission" name="transmission" required
+                                    placeholder="Enter transmission type">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="color" class="form-label">Color:</label>
+                                <input type="text" class="form-control" id="color" name="color" required
+                                    placeholder="Enter car color">
+                            </div>
+                        </div>
 
-                <!-- File Upload -->
-                <div class="mb-4">
-                    <label for="picture_url" class="form-label">Upload Car Picture:</label>
-                    <input type="file" class="form-control" id="picture_url" name="picture_url" accept="image/*">
-                </div>
+                        <!-- File Upload -->
+                        <div class="mb-4">
+                            <label for="picture_url" class="form-label">Upload Car Picture:</label>
+                            <input type="file" class="form-control" id="picture_url" name="picture_url"
+                                accept="image/*">
+                        </div>
 
-                <!-- Submit Button -->
-                <!-- <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg">Add Car</button>
-                </div> -->
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary btn-lg" style="width: auto;">Add Car</button>
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg" style="width: auto;">Add Car</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
