@@ -265,5 +265,43 @@ def addcar():
         return render_template("addcar.html")
 
 
+# car detail route
+@app.route("/cars", methods=["GET"], endpoint="cars")
+@login_is_required
+def cars():
+    try:
+        user_id = session["google_id"]
+        google_admin_id = config.get("GOOGLE_ADMIN_ID")
+        # Fetch all plants from the database
+        if user_id == google_admin_id:
+            # Admin can see all plants
+            all_cars = Car.query.all()
+        else:
+            # Normal users can only see their own plants
+            all_cars = Car.query.filter_by(user_id=user_id).all()
+
+        return render_template("cars.html", cars=all_cars, user_id=user_id)
+
+    except Exception as e:
+        print(f"Error fetching cars: {e}")
+        return "An error occurred while fetching the cars.", 500
+
+
+@app.route("/delete_car/<int:id>", methods=["POST"], endpoint="delete_car")
+def delete_car(id):
+    try:
+        user = my_db.User.query.get(id)
+        car = my_db.Car.query.get(id)  # Use the passed ID
+        if car:
+            db.session.delete(car)
+            db.session.commit()
+            flash("Car deleted successfully!", "success")
+        else:
+            flash("car not found.", "success")
+        return redirect(url_for("cars"))
+    except Exception as e:
+        return f"Error: {e}"
+
+
 if __name__ == "__main__":
     app.run()
