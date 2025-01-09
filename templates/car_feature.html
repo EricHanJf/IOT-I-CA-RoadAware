@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Car Feature Control{% endblock %}
+{% block body %}
+{% include 'navbar.html' %}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Car Feature Control</h1>
+
+    <div class="text-center mb-4">
+        {% if make %}
+        <h2 class="car-make">{{ make }}</h2>
+        {% else %}
+        <p class="text-muted">No car make available.</p>
+        {% endif %}
+
+        {% if picture %}
+        <img src="{{ url_for('static', filename=picture) }}" alt="{{ make }}" class="img-thumbnail mt-3"
+            style="max-width: 300px;">
+        {% else %}
+        <p class="text-muted">No car image available.</p>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <!-- LED Control Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">LED Control</h5>
+                    <p class="card-text">Use the buttons below to control the LED.</p>
+                    <div class="d-flex justify-content-between">
+                        <button id="ledOnButton" class="btn btn-light">Turn ON LED</button>
+                        <button id="ledOffButton" class="btn btn-dark">Turn OFF LED</button>
+                    </div>
+                    <p id="status" class="status-text mt-3">Status: LED is OFF</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distance Monitoring Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Distance Monitoring</h5>
+                    <p class="card-text">Use the buttons below to start or stop distance monitoring.</p>
+                    <div class="d-flex justify-content-between">
+                        <button id="distanceOnButton" class="btn btn-light">Turn ON Monitoring</button>
+                        <button id="distanceOffButton" class="btn btn-dark">Turn OFF Monitoring</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
