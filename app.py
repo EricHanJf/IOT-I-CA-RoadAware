@@ -7,6 +7,7 @@ from flask import (
     abort,
     url_for,
     flash,
+    jsonify,
 )
 import requests
 import os
@@ -18,7 +19,7 @@ import pathlib
 from datetime import datetime
 from .config import config
 from . import my_db
-from .my_db import Car
+from .my_db import Car, Distance
 from werkzeug.utils import secure_filename
 
 # from . import my_db
@@ -255,7 +256,7 @@ def addcar():
             db.session.commit()
             flash("Car added successfully!", "success")
             return redirect(
-                url_for("news")
+                url_for("addcar")
             )  # Redirect to a success page or back to form
         except Exception as e:
             app.logger.error(f"Error adding car: {e}")
@@ -301,6 +302,107 @@ def delete_car(id):
         return redirect(url_for("cars"))
     except Exception as e:
         return f"Error: {e}"
+
+
+# Car feature route
+@app.route("/car_feature", methods=["GET"], endpoint="car_feature")
+@login_is_required
+def car_feature():
+    picture = request.args.get("picture_url")  # This should match the template variable
+    make = request.args.get("make")
+    id = request.args.get("id")  # Assuming car_id is passed to identify the car
+    print(f"Picture: {picture}, Make: {make}")
+    return render_template(
+        "car_feature.html",
+        id=id,
+        picture=picture,
+        make=make,
+    )
+
+
+# @app.route("/car_feature", methods=["GET"], endpoint="car_feature")
+# @login_is_required
+# def car_feature():
+#     picture = request.args.get("picture_url")
+#     make = request.args.get("make")
+#     car_id = request.args.get("car_id")  # Assuming car_id is passed to identify the car
+
+#     # Fetch the latest distance data for the given car_id
+#     latest_distance = (
+#         db.session.query(DistanceMonitor)
+#         .filter(DistanceMonitor.car_id == car_id)
+#         .order_by(DistanceMonitor.timestamp.desc())
+#         .first()
+#     )
+
+#     distance = latest_distance.distance if latest_distance else "No data"
+
+#     print(f"Picture: {picture}, Make: {make}, Latest Distance: {distance}")
+
+#     return render_template(
+#         "car_feature.html",
+#         picture=picture,
+#         make=make,
+#         distance=distance,  # Pass the latest distance to the template
+#     )
+
+
+# @app.route("/api/store_distance_data", methods=["POST"])
+# def store_distance_data():
+#     try:
+#         # Parse JSON data from the request
+#         data = request.get_json()
+
+#         # Validate required fields (distance and car_id)
+#         if not all(key in data for key in ("distance", "car_id")):
+#             return jsonify({"error": "Missing required data"}), 400
+
+#         # Extract other data from the request
+#         distance = data["distance"]
+#         # car_id = data["car_id"]  # Get car_id from the request body
+#         # car_id = my_db.Car.query.get(id)
+#         user_id = session.get("google_id")  # Assuming user_id is stored in the session
+
+#         if not user_id:
+#             return jsonify({"error": "User is not authenticated"}), 401
+
+#         # Create a new Distance entry
+#         new_data = Distance(
+#             distance=distance,
+#             # car_id=car_id,  # Store the car_id from the request
+#             user_id=user_id,  # Store the user_id from the session
+#         )
+
+#         # Add the new entry to the database
+#         db.session.add(new_data)
+#         db.session.commit()
+
+#         return jsonify({"message": "Distance data stored successfully"}), 201
+
+#     except Exception as e:
+#         # Handle errors and rollback if needed
+#         db.session.rollback()
+#         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/store_distance_data", methods=["POST"])
+def store_distance_data():
+    try:
+        data = request.get_json()
+        print("Received data:", data)
+
+        if "distance" not in data:
+            return jsonify({"error": "Missing distance data"}), 400
+
+        new_data = Distance(distance=data["distance"])
+        db.session.add(new_data)
+        db.session.commit()
+
+        print("Data stored successfully")
+        return jsonify({"message": "TSL2561 data stored successfully"}), 201
+    except Exception as e:
+        print("Error storing data:", str(e))
+        return jsonify({"error": "Failed to store data"}), 500
 
 
 if __name__ == "__main__":
