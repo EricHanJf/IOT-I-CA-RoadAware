@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}History Data{% endblock %}
+{% block body %}
+{% include 'navbar.html' %}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4 text-primary">Previous Distance Data Table</h1>
+    <div class="border-top my-5"></div>
+
+    <!-- Filter Form -->
+    <form method="get" action="/distance_previous_data" class="mb-4 p-4 border rounded shadow-sm bg-light">
+        <div class="row g-3">
+            <div class="col-md-5">
+                <label for="start_time" class="form-label">Start Time:</label>
+                <input type="datetime-local" id="start_time" name="start_time" class="form-control">
+            </div>
+            <div class="col-md-5">
+                <label for="end_time" class="form-label">End Time:</label>
+                <input type="datetime-local" id="end_time" name="end_time" class="form-control">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Data Table -->
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-bordered table-striped shadow-sm">
+            <thead class="table-primary">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Distance (cm)</th>
+                    <th scope="col">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in distances %}
+                <tr>
+                    <td>{{ record.id }}</td>
+                    <td>{{ record.distance }}</td>
+                    <td>{{ record.timestamp }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
