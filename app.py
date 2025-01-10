@@ -107,7 +107,8 @@ def callback():
 # Homepage route
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")
+    google_avatar = session.get("google_avatar")
+    return render_template("index.html", avatar_url=google_avatar)
 
 
 # for admin globally accessible across templates
@@ -207,6 +208,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 @app.route("/addcar", methods=["GET", "POST"], endpoint="addcar")
 @login_is_required
 def addcar():
+    google_avatar = session.get("google_avatar")
     if request.method == "POST":
         try:
             # Get form data
@@ -217,7 +219,6 @@ def addcar():
             transmission = request.form.get("transmission")
             color = request.form.get("color")
             picture = request.files.get("picture_url")  # For file uploads
-
             # Validate required fields
             if not all([make, year, car_type, engine_type, transmission, color]):
                 flash("All fields are required except the picture.", "danger")
@@ -263,7 +264,7 @@ def addcar():
             flash("An error occurred while adding the car. Please try again.", "danger")
             return redirect(url_for("addcar"))
     else:
-        return render_template("addcar.html")
+        return render_template("addcar.html", avatar_url=google_avatar)
 
 
 # car detail route
@@ -273,6 +274,7 @@ def cars():
     try:
         user_id = session["google_id"]
         google_admin_id = config.get("GOOGLE_ADMIN_ID")
+        google_avatar = session.get("google_avatar")
         # Fetch all plants from the database
         if user_id == google_admin_id:
             # Admin can see all plants
@@ -281,7 +283,9 @@ def cars():
             # Normal users can only see their own plants
             all_cars = Car.query.filter_by(user_id=user_id).all()
 
-        return render_template("cars.html", cars=all_cars, user_id=user_id)
+        return render_template(
+            "cars.html", cars=all_cars, user_id=user_id, avatar_url=google_avatar
+        )
 
     except Exception as e:
         print(f"Error fetching cars: {e}")
@@ -311,78 +315,15 @@ def car_feature():
     picture = request.args.get("picture_url")  # This should match the template variable
     make = request.args.get("make")
     id = request.args.get("id")  # Assuming car_id is passed to identify the car
+    google_avatar = session.get("google_avatar")
     print(f"Picture: {picture}, Make: {make}")
     return render_template(
         "car_feature.html",
         id=id,
         picture=picture,
         make=make,
+        avatar_url=google_avatar,
     )
-
-
-# @app.route("/car_feature", methods=["GET"], endpoint="car_feature")
-# @login_is_required
-# def car_feature():
-#     picture = request.args.get("picture_url")
-#     make = request.args.get("make")
-#     car_id = request.args.get("car_id")  # Assuming car_id is passed to identify the car
-
-#     # Fetch the latest distance data for the given car_id
-#     latest_distance = (
-#         db.session.query(DistanceMonitor)
-#         .filter(DistanceMonitor.car_id == car_id)
-#         .order_by(DistanceMonitor.timestamp.desc())
-#         .first()
-#     )
-
-#     distance = latest_distance.distance if latest_distance else "No data"
-
-#     print(f"Picture: {picture}, Make: {make}, Latest Distance: {distance}")
-
-#     return render_template(
-#         "car_feature.html",
-#         picture=picture,
-#         make=make,
-#         distance=distance,  # Pass the latest distance to the template
-#     )
-
-
-# @app.route("/api/store_distance_data", methods=["POST"])
-# def store_distance_data():
-#     try:
-#         # Parse JSON data from the request
-#         data = request.get_json()
-
-#         # Validate required fields (distance and car_id)
-#         if not all(key in data for key in ("distance", "car_id")):
-#             return jsonify({"error": "Missing required data"}), 400
-
-#         # Extract other data from the request
-#         distance = data["distance"]
-#         # car_id = data["car_id"]  # Get car_id from the request body
-#         # car_id = my_db.Car.query.get(id)
-#         user_id = session.get("google_id")  # Assuming user_id is stored in the session
-
-#         if not user_id:
-#             return jsonify({"error": "User is not authenticated"}), 401
-
-#         # Create a new Distance entry
-#         new_data = Distance(
-#             distance=distance,
-#             # car_id=car_id,  # Store the car_id from the request
-#             user_id=user_id,  # Store the user_id from the session
-#         )
-
-#         # Add the new entry to the database
-#         db.session.add(new_data)
-#         db.session.commit()
-
-#         return jsonify({"message": "Distance data stored successfully"}), 201
-
-#     except Exception as e:
-#         # Handle errors and rollback if needed
-#         db.session.rollback()
-#         return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/store_distance_data", methods=["POST"])
@@ -403,6 +344,39 @@ def store_distance_data():
     except Exception as e:
         print("Error storing data:", str(e))
         return jsonify({"error": "Failed to store data"}), 500
+
+
+# distance Previous data route
+@app.route(
+    "/distance_previous_data", methods=["GET"], endpoint="distance_previous_data"
+)
+@login_is_required
+def distance_previous_data():
+    google_avatar = session.get("google_avatar")
+    try:
+        # Get optional filter parameters from the request
+        start_time = request.args.get("start_time")  # Format: YYYY-MM-DD HH:MM:SS
+        end_time = request.args.get("end_time")  # Format: YYYY-MM-DD HH:MM:SS
+
+        # Build the query
+        query = Distance.query
+        if start_time:
+            query = query.filter(Distance.timestamp >= start_time)
+        if end_time:
+            query = query.filter(Distance.timestamp <= end_time)
+
+        # Execute the query
+        distances = query.order_by(Distance.timestamp).all()
+
+        # Render the template with data
+        return render_template(
+            "distance_previous_data.html",
+            distances=distances,
+            avatar_url=google_avatar,
+        )
+    except Exception as e:
+        print("Error fetching distance data:", str(e))
+        return "Failed to fetch distance data", 500
 
 
 if __name__ == "__main__":
