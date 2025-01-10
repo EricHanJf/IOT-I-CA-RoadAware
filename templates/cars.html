@@ -51,7 +51,7 @@
                     <td class="text-center align-middle">
                         {% if car.picture_url %}
                         <a class="image-link"
-                            href="{{ url_for('car_feature', make=car.make, picture_url=car.picture_url) }}">
+                            href="{{ url_for('car_feature', make=car.make, picture_url=car.picture_url, id=car.id) }}">
                             <img class="img-thumbnail" src="{{ url_for('static', filename=car.picture_url) }}"
                                 alt="{{ car.make }}" style="max-width: 100px;">
                         </a>
