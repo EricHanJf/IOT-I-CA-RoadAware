@@ -18,7 +18,13 @@
     <div class="row">
         <!-- Car Image Section -->
         <div class="col-md-6 text-center mb-4">
+
             <div class="d-flex flex-column justify-content-end" style="min-height: 300px;">
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('distance_previous_data') }}" class="btn btn-outline-primary btn-lg">
+                        Check Previous Data
+                    </a>
+                </div>
                 {% if id %}
                 <h2 class="car-id text-secondary mt-3">Car ID: {{ id }}</h2>
                 <input type="hidden" id="car_id" value="{{ id }}">
