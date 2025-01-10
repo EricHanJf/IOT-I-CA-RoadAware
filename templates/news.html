@@ -1,36 +1,57 @@
-{% extends "base.html"%}
+{% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block body %}
 {% include 'navbar.html' %}
 <div class="container">
-    <div class="text-center mb-4">
-        <img src="{{ avatar_url }}" alt="Google Avatar" class="rounded-circle shadow"
-            style="width: 80px; height: 80px;">
-        <h4 class="mt-3">Hello, {{ session["name"] }}</h4>
-    </div>
-    <h1 class="my-4 text-center">welcome to my app hello</h1>
-    <p>Session Google ID: {{ session.get("google_id") }}</p>
-    <!-- <p>Admin Google ID: {{ google_admin_id}}</p> -->
+    <ul class="navbar-nav justify-content-center my-5 flex-row">
+        <li class="nav-item mx-3">
+            <a class="nav-link active" aria-current="page" href="/news?query=latest">Latest</a>
+        </li>
+        <li class="nav-item mx-3">
+            <a class="nav-link" href="/news?query=US">US</a>
+        </li>
+        <li class="nav-item mx-3">
+            <a class="nav-link" href="/news?query=World">World</a>
+        </li>
+        <li class="nav-item mx-3">
+            <a class="nav-link" href="/news?query=Technology">Technology</a>
+        </li>
+        <li class="nav-item mx-3">
+            <a class="nav-link" href="/news?query=Health">Health</a>
+        </li>
+        <li class="nav-item mx-3">
+            <a class="nav-link" href="/news?query=Finance">Finance</a>
+        </li>
+        <li class="nav-item mx-3">
+            <a class="nav-link" href="/news?query=Entertainment">Entertainment</a>
+        </li>
+        <li class="nav-item mx-3">
+            <a class="nav-link" href="/news?query=Game">Game</a>
+        </li>
+    </ul>
+    <div class="border-top my-5"></div>
+    <h1 class="my-4 text-center">Welcome to Daily News</h1>
+    <div class="border-top my-5"></div>
     <form class="form-inline justify-content-center mb-4" method="get" action="/news">
         <input class="form-control mr-5" type="text" name="query" value="{{ query if query != 'latest' else '' }}"
             placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
+        <button class="btn btn-dark" type="submit">Search</button>
     </form>
     <div class="row">
         {% for article in articles %}
         <div class="col-md-6">
             <div class="card mb-4 news-article">
-                {% if article.urlToImage%}
+                {% if article.urlToImage %}
                 <img src="{{ article.urlToImage }}" alt="picture" class="card-img-top">
                 {% endif %}
                 <div class="card-body">
                     <h5><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></h5>
-                    <p class="card-text"> {{ article.description }}</p>
+                    <p class="card-text">{{ article.description }}</p>
+                    <!-- <a href="{{ article.url }}" class="btn btn-primary" target="_blank">Read More</a> -->
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
-
 </div>
 {% endblock %}
