@@ -1,51 +1,82 @@
 {% extends "base.html" %}
 {% block title %}Car Feature Control{% endblock %}
+
 {% block body %}
 {% include 'navbar.html' %}
 
 <div class="container mt-5">
     <h1 class="text-center mb-4">Car Feature Control</h1>
 
-    <div class="text-center mb-4">
-        {% if make %}
-        <h2 class="car-make">{{ make }}</h2>
-        {% else %}
-        <p class="text-muted">No car make available.</p>
-        {% endif %}
+    {% if make %}
+    <h2 class="car-make text-primary text-center">{{ make }}</h2>
+    {% else %}
+    <p class="text-muted">No car make available.</p>
+    {% endif %}
 
-        {% if picture %}
-        <img src="{{ url_for('static', filename=picture) }}" alt="{{ make }}" class="img-thumbnail mt-3"
-            style="max-width: 300px;">
-        {% else %}
-        <p class="text-muted">No car image available.</p>
-        {% endif %}
-    </div>
+    <div class="border-top my-5"></div>
 
     <div class="row">
-        <!-- LED Control Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">LED Control</h5>
-                    <p class="card-text">Use the buttons below to control the LED.</p>
-                    <div class="d-flex justify-content-between">
-                        <button id="ledOnButton" class="btn btn-light">Turn ON LED</button>
-                        <button id="ledOffButton" class="btn btn-dark">Turn OFF LED</button>
-                    </div>
-                    <p id="status" class="status-text mt-3">Status: LED is OFF</p>
-                </div>
+        <!-- Car Image Section -->
+        <div class="col-md-6 text-center mb-4">
+            <div class="d-flex flex-column justify-content-end" style="min-height: 300px;">
+                {% if id %}
+                <h2 class="car-id text-secondary mt-3">Car ID: {{ id }}</h2>
+                <input type="hidden" id="car_id" value="{{ id }}">
+                {% else %}
+                <p class="text-muted">No car id available.</p>
+                {% endif %}
+                {% if picture %}
+                <img src="{{ url_for('static', filename=picture) }}" alt="{{ make }}" class="img-thumbnail"
+                    style="max-width: 100%; height: auto;">
+                {% else %}
+                <img src="{{ url_for('static', filename='placeholder.png') }}" alt="No Image Available"
+                    class="img-thumbnail" style="max-width: 100%; height: auto;">
+                <p class="text-muted">No car image available.</p>
+                {% endif %}
+
             </div>
         </div>
+        <div class="col-md-6 text-center mb-4">
+            <div class="row">
+                <!-- Real-Time Distance Output Section -->
+                <div class="col-12 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Real-Time Distance Data</h5>
+                            <div class="sensor-item p-3 bg-light rounded">
+                                <p id="distance_id" class="m-0 text-center text-primary"
+                                    style="font-size: 2rem; font-weight: bold;">Distance: {{ distance }} cm</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- LED Control Section -->
+                <div class="col-12 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">LED Control</h5>
+                            <p class="card-text">Use the buttons below to control the LED.</p>
+                            <div class="mt-auto d-flex justify-content-between">
+                                <button id="ledOnButton" class="btn btn-light">Turn ON LED</button>
+                                <button id="ledOffButton" class="btn btn-dark">Turn OFF LED</button>
+                            </div>
+                            <p id="status-LED" class="status-text mt-3">Status: LED is OFF</p>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Distance Monitoring Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Distance Monitoring</h5>
-                    <p class="card-text">Use the buttons below to start or stop distance monitoring.</p>
-                    <div class="d-flex justify-content-between">
-                        <button id="distanceOnButton" class="btn btn-light">Turn ON Monitoring</button>
-                        <button id="distanceOffButton" class="btn btn-dark">Turn OFF Monitoring</button>
+                <!-- Distance Monitoring Section -->
+                <div class="col-12 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Distance Monitoring</h5>
+                            <p class="card-text">Use the buttons below to start or stop distance monitoring.</p>
+                            <div class="mt-auto d-flex justify-content-between mb-3">
+                                <button id="distanceOnButton" class="btn btn-light">Turn ON Monitoring</button>
+                                <button id="distanceOffButton" class="btn btn-dark">Turn OFF Monitoring</button>
+                            </div>
+                            <p id="status-distance" class="status-text mt-3">Status: Monitoring is OFF</p>
+                        </div>
                     </div>
                 </div>
             </div>
