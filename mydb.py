@@ -59,6 +59,30 @@ class Car(db.Model):
         self.picture_url = picture_url
 
 
+class Distance(db.Model):
+    __tablename__ = "distance"  # Update the table name to match the new schema
+    id = db.Column(db.Integer, primary_key=True)  # Primary key
+    distance = db.Column(db.Float, nullable=False)  # Distance field, required
+    timestamp = db.Column(
+        db.DateTime, default=datetime.utcnow
+    )  # Timestamp with default value
+
+    def __init__(self, distance):
+        self.distance = distance
+
+
+# class Distance(db.Model):
+#     __tablename__ = "distance"
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.String(21), db.ForeignKey("user.user_id"))
+#     distance = db.Column(db.Float)
+#     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+#     def __init__(self, user_id, distance):
+#         self.user_id = user_id
+#         self.distance = distance
+
+
 def delete_all():
     try:
         db.session.query(User).delete()
