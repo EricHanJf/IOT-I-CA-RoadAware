@@ -3,7 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const ledOffButton = document.getElementById("ledOffButton");
     const distanceOnButton = document.getElementById("distanceOnButton");
     const distanceOffButton = document.getElementById("distanceOffButton");
-    const statusText = document.getElementById("status");
+    const statusTextLED = document.getElementById("status-LED");
+    const statusTextDistance = document.getElementById("status-distance");
+    const distanceDisplay = document.getElementById("distance_id");
 
     let pubnub;
     const channelName = "RoadEasy";
@@ -22,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Set up listeners
         pubnub.addListener({
-            message: handlePubNubMessage,
+            message: handlePubNubMessage, // Call handlePubNubMessage when a message is received
             status: (statusEvent) => {
                 console.log("PubNub status:", statusEvent);
             },
@@ -34,26 +36,67 @@ document.addEventListener("DOMContentLoaded", () => {
         const channel = event.channel;
         const message = event.message;
 
-        if (channel === channelName && message.command) {
+        if (channel === channelName && message.distance) {
+            // If a message with distance is received, update the display
+            updateDistanceDisplay(message.distance);
+        } else if (message.command) {
+            // Handle other commands like LED on/off
             handleMessage(message);
         } else {
             console.warn("Received message from unknown channel:", channel);
         }
     };
 
+    // Function to update the distance display on the page
+    const updateDistanceDisplay = (distance) => {
+        console.log("Received distance:", distance);
+        const distanceValue = parseFloat(distance);
+        if (!isNaN(distanceValue)) {
+            // Update the displayed distance in the HTML element
+            distanceDisplay.textContent = `${distanceValue.toFixed(2)} cm`;
+        } else {
+            console.warn("Invalid distance value:", distance);
+        }
+    };
+
+    // Handle other commands like LED on/off
     const handleMessage = (message) => {
         console.log("Received Message:", message);
+
         if (message.command === "led on") {
-            updateLEDStatus("LED is ON");
+            updateStatus(statusTextLED,"LED is ON");
         } else if (message.command === "led off") {
-            updateLEDStatus("LED is OFF");
+            updateStatus(statusTextLED,"LED is OFF");
         } else if (message.command === "distance on") {
-            updateLEDStatus("Distance is ON");
+            updateStatus(statusTextDistance,"Monitoring is ON");
         } else if (message.command === "distance off") {
-            updateLEDStatus("Distance is OFF");
+            updateStatus(statusTextDistance,"Monitoring is OFF");
         } else {
             console.warn("Unknown command:", message.command);
         }
+
+        if (message.distance !== undefined) {
+            document.getElementById("distance_id").textContent = `${message.distance.toFixed(2)} cm`;
+            storeDistanceData(message.distance);
+          }
+
+        console.log("Received message:", message);
+        const storeDistanceData = (distance) => {
+            fetch("https://www.sd3siot.online/api/store_distance_data", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ distance }),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => console.log("Distance data stored:", data))
+                .catch((error) => console.error("Error storing distance data:", error));
+        };
+        
     };
 
     // Send LED command to PubNub
@@ -71,10 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // Update LED status text
-    const updateLEDStatus = (status) => {
-        statusText.textContent = `Status: ${status}`;
+    // const updateLEDStatus = (status) => {
+    //     statusText.textContent = `Status: ${status}`;
+    // };
+    const updateStatus = (statusElement, status) => {
+        statusElement.textContent = `Status: ${status}`;
     };
-
     // Set up event listeners for buttons
     ledOnButton.addEventListener("click", () => {
         sendLEDCommand("led on");
@@ -90,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     distanceOffButton.addEventListener("click", () => {
         sendLEDCommand("distance off");
-    })
+    });
 
     // Initialize PubNub
     setupPubNub();
