@@ -10,10 +10,12 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <title>{% block title %}Home Page{% endblock %}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="static/js/access_manager.js"></script>
     <script src="static/js/main.js"></script>
+
 </head>
 
-<body>
+<body onload="setupPubNub(); refreshToken();">
     {%block body %}
     {% endblock%}
 </body>
