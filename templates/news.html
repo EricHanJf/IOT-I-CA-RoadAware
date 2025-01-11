@@ -3,32 +3,43 @@
 {% block body %}
 {% include 'navbar.html' %}
 <div class="container">
-    <ul class="navbar-nav justify-content-center my-5 flex-row">
-        <li class="nav-item mx-3">
-            <a class="nav-link active" aria-current="page" href="/news?query=latest">Latest</a>
-        </li>
-        <li class="nav-item mx-3">
-            <a class="nav-link" href="/news?query=US">US</a>
-        </li>
-        <li class="nav-item mx-3">
-            <a class="nav-link" href="/news?query=World">World</a>
-        </li>
-        <li class="nav-item mx-3">
-            <a class="nav-link" href="/news?query=Technology">Technology</a>
-        </li>
-        <li class="nav-item mx-3">
-            <a class="nav-link" href="/news?query=Health">Health</a>
-        </li>
-        <li class="nav-item mx-3">
-            <a class="nav-link" href="/news?query=Finance">Finance</a>
-        </li>
-        <li class="nav-item mx-3">
-            <a class="nav-link" href="/news?query=Entertainment">Entertainment</a>
-        </li>
-        <li class="nav-item mx-3">
-            <a class="nav-link" href="/news?query=Game">Game</a>
-        </li>
-    </ul>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light my-5">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Daily News</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item mx-3">
+                        <a class="nav-link active" aria-current="page" href="/news?query=latest">Latest</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                        <a class="nav-link" href="/news?query=US">US</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                        <a class="nav-link" href="/news?query=World">World</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                        <a class="nav-link" href="/news?query=Technology">Technology</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                        <a class="nav-link" href="/news?query=Health">Health</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                        <a class="nav-link" href="/news?query=Finance">Finance</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                        <a class="nav-link" href="/news?query=Entertainment">Entertainment</a>
+                    </li>
+                    <li class="nav-item mx-3">
+                        <a class="nav-link" href="/news?query=Game">Game</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <div class="border-top my-5"></div>
     <h1 class="my-4 text-center">Welcome to Daily News</h1>
     <div class="border-top my-5"></div>
