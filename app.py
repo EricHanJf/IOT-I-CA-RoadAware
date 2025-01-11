@@ -9,6 +9,8 @@ from flask import (
     flash,
     jsonify,
 )
+import json
+import time
 import requests
 import os
 from google.oauth2 import id_token
@@ -18,7 +20,7 @@ import google.auth.transport.requests
 import pathlib
 from datetime import datetime
 from .config import config
-from . import my_db
+from . import my_db, pb
 from .my_db import Car, Distance
 from werkzeug.utils import secure_filename
 
@@ -377,6 +379,127 @@ def distance_previous_data():
     except Exception as e:
         print("Error fetching distance data:", str(e))
         return "Failed to fetch distance data", 500
+
+
+@app.route("/grant-<user_id>-<read>-<write>", methods=["POST"])
+def grant_access(user_id, read, write):
+    if session.get("google_id"):
+        if session["google_id"] == config.get("GOOGLE_ADMIN_ID"):
+            print(f"Admin granting {user_id}-{read}-{write}")
+            my_db.add_user_permission(user_id, read, write)
+            if read == "true" and write == "true":
+                token = pb.grant_read_and_write_access(user_id)
+                my_db.add_token(user_id, token)
+                access_response = {
+                    "token": token,
+                    "cipher_key": pb.cipher_key,
+                    "uuid": user_id,
+                }
+                return json.dumps(access_response)
+            elif read == True and write == True:
+                token = pb.grant_read_and_write_access(user_id)
+                my_db.add_token(user_id, token)
+                return token
+            elif read == "true" and write == "false":
+                token = pb.grant_read_access(user_id)
+                my_db.add_token(user_id, token)
+                access_response = {
+                    "token": token,
+                    "cipher_key": pb.cipher_key,
+                    "uuid": user_id,
+                }
+                return json.dumps(access_response)
+            elif read == "false" and write == "true":
+                token = pb.grant_write_access(user_id)
+                my_db.add_token(user_id, token)
+                access_response = {
+                    "token": token,
+                    "cipher_key": pb.cipher_key,
+                    "uuid": user_id,
+                }
+                return json.dumps(access_response)
+            else:
+                # Remove any existing token from the database
+                my_db.delete_revoked_token(user_id)
+                access_response = {
+                    "token": 123,
+                    "cipher_key": pb.cipher_key,
+                    "uuid": user_id,
+                }
+                return json.dumps(access_response)
+        else:
+            print(f"Non admin attempting to grant privileges {user_id}-{read}-{write}")
+            my_db.add_user_permission(user_id, read, write)
+            token = my_db.get_token(user_id)
+            if token is not None:
+                timestamp, ttl, user_id, read, write = pb.parse_token(token)
+                current_time = time.time
+                if (timestamp + (ttl * 60)) - current_time > 0:
+                    print("Token is still valid")
+                    access_response = {
+                        "token": token,
+                        "cipher_key": pb.cipher_key,
+                        "uuid": user_id,
+                    }
+                    return json.dumps(access_response)
+                else:
+                    print("Token refresh needed")
+                    if read and write:
+                        token = pb.grant_read_write_access(user_id)
+                        my_db.add_token(user_id, token)
+                        access_response = {
+                            "token": token,
+                            "cipher_key": pb.cipher_key,
+                            "uuid": user_id,
+                        }
+                        return json.dumps(access_response)
+                    elif read:
+                        token = pb.grant_read_access(user_id)
+                        my_db.add_token(user_id, token)
+                        access_response = {
+                            "token": token,
+                            "cipher_key": pb.cipher_key,
+                            "uuid": user_id,
+                        }
+                        return json.dumps(access_response)
+                    elif read:
+                        token = pb.gran_write_access(user_id)
+                        my_db.add_token(user_id, token)
+                        access_response = {
+                            "token": token,
+                            "cipher_key": pb.cipher_key,
+                            "uuid": user_id,
+                        }
+                        return json.dumps(access_response)
+                    else:
+                        access_response = {
+                            "token": 123,
+                            "cipher_key": pb.cipher_key,
+                            "uuid": user_id,
+                        }
+                        return json.dumps(access_response)
+
+
+@app.route("/get_user_token", methods=["POST"])
+def get_user_token():
+    user_id = session["google_id"]
+    token = my_db.get_token(user_id)
+    if token is not None:
+        token = get_or_refresh_token(token)
+        token_response = {"token": token, "cipher_key": pb.cipher_key, "uuid": user_id}
+    else:
+        token_response = {"token": 123, "cipher_key": pb.cipher_key, "uuid": user_id}
+    return token_response
+
+
+def get_or_refresh_token(token):
+    timestamp, ttl, uuid, read, write = pb.parse_token(token)
+    current_time = time.time()
+    if (timestamp + (ttl * 60)) - current_time > 0:
+        return token
+    else:
+        # The token has expired
+        return grant_access(uuid, read, write)
 
 
 if __name__ == "__main__":
